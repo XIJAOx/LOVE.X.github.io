@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+<meta name="theme-color" content="#f5f5f5">
+<meta name="format-detection" content="telephone=no">
+<title>私密空间</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 启动页 -->
+<div id="splashScreen">
+  <div class="splash-icon">💌</div>
+  <div class="splash-title">私密空间</div>
+  <div class="splash-sub">记录你们的每一刻</div>
+</div>
+
+<div id="app">
+  <div id="sandboxHint">
+    <b>⚠️ 当前处于受限预览环境</b><br>
+    本地存储 / 文件导入导出可能受限。请用浏览器打开本地文件以使用全部功能。
+  </div>
+
+  <!-- ============================================================
+       视图：主页
+       ============================================================ -->
+  <section class="view" id="viewHome">
+    <div class="topbar">
+      <div class="topbar-title">消息</div>
+      <button class="topbar-btn" id="btnNewGroup" title="发起群聊">👥</button>
+    </div>
+    <div class="home-scroll" id="homeScroll">
+      <div class="home-pages" id="homePages">
+        <div class="home-page">
+          <div class="grid-menu">
+            <div class="grid-menu-item" data-nav="period"><div class="icon">🌸</div><div class="label">经期</div></div>
+            <div class="grid-menu-item" data-nav="divination"><div class="icon">🔮</div><div class="label">占卜</div></div>
+            <div class="grid-menu-item" data-nav="favorites"><div class="icon">⭐</div><div class="label">收藏</div></div>
+            <div class="grid-menu-item" data-nav="music"><div class="icon">🎵</div><div class="label">音乐库</div></div>
+            <div class="grid-menu-item" data-nav="questions"><div class="icon">❓</div><div class="label">提问库</div></div>
+            <div class="grid-menu-item" data-nav="water"><div class="icon">💧</div><div class="label">喝水</div></div>
+            <div class="grid-menu-item" data-nav="wishes"><div class="icon">🎁</div><div class="label">许愿</div></div>
+            <div class="grid-menu-item" data-nav="settings"><div class="icon">⚙️</div><div class="label">设置</div></div>
+            <div class="grid-menu-item" data-nav="letters"><div class="icon">💌</div><div class="label">信箱</div></div>
+            <div class="grid-menu-item" data-nav="calls"><div class="icon">📞</div><div class="label">通话</div></div>
+            <div class="grid-menu-item" data-nav="diary"><div class="icon">📔</div><div class="label">日记</div></div>
+            <div class="grid-menu-item" data-nav="countdown"><div class="icon">⏳</div><div class="label">倒计时</div></div>
+            <div class="grid-menu-item" data-nav="stats"><div class="icon">📊</div><div class="label">统计</div></div>
+            <div class="grid-menu-item" data-nav="characters"><div class="icon">👤</div><div class="label">梦角</div></div>
+            <div class="grid-menu-item" data-nav="wallpapers"><div class="icon">🖼️</div><div class="label">壁纸</div></div>
+            <div class="grid-menu-item" data-nav="sounds"><div class="icon">🔔</div><div class="label">音效</div></div>
+          </div>
+          <div class="card-title" style="padding-left:4px; margin-bottom:10px;">聊天会话</div>
+          <div id="sessionList"></div>
+        </div>
+        <div class="home-page">
+          <div class="card">
+            <div class="card-title">今日概览</div>
+            <div id="overviewList" style="font-size:13.5px; line-height:1.9; color:var(--text-muted);"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">快捷操作</div>
+            <div class="btn-row">
+              <button class="btn btn-ghost" data-nav="moments">朋友圈</button>
+              <button class="btn btn-ghost" data-nav="letters">信箱</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page-indicator">
+        <div class="page-dot active"></div>
+        <div class="page-dot"></div>
+      </div>
+    </div>
+    <nav class="tabbar">
+      <div class="tab-item active" data-tab="home"><div class="tab-icon">💬</div><div>消息</div></div>
+      <div class="tab-item" data-tab="moments"><div class="tab-icon">🌍</div><div>朋友圈</div></div>
+      <div class="tab-item" data-tab="wishes"><div class="tab-icon">🎁</div><div>许愿</div></div>
+      <div class="tab-item" data-tab="settings"><div class="tab-icon">⚙️</div><div>设置</div></div>
+    </nav>
+  </section>
+
+  <!-- ============================================================
+       视图：聊天会话
+       ============================================================ -->
+  <section class="view" id="viewChat">
+    <header class="chat-header">
+      <button class="topbar-btn" id="btnChatBack">←</button>
+      <div class="avatar avatar-header" id="chatPeerAvatar">🐰</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:16px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="chatPeerName">TA</div>
+        <div style="font-size:11.5px; color:var(--text-muted);" id="chatPeerSub">在线</div>
+      </div>
+      <button class="topbar-btn" id="btnChatCall" title="通话">📞</button>
+      <button class="topbar-btn" id="btnChatMore" title="更多">⋮</button>
+    </header>
+    <div class="chat-body">
+      <div class="chat-bg-layer" id="chatBgLayer"></div>
+      <div class="chat-scroll" id="chatScroll">
+        <div id="messages"></div>
+      </div>
+    </div>
+    <div class="emoji-panel" id="emojiPanel">
+      <div class="emoji-grid" id="emojiGrid"></div>
+    </div>
+    <footer class="chat-composer">
+      <button class="icon-square" id="btnEmoji">😊</button>
+      <textarea id="chatInput" rows="1" placeholder="说点什么…" enterkeyhint="send"></textarea>
+      <button class="send-btn" id="btnSend" disabled>发送</button>
+    </footer>
+  </section>
+
+  <!-- ============================================================
+       视图：朋友圈
+       ============================================================ -->
+  <section class="view" id="viewMoments">
+    <div class="topbar">
+      <div class="topbar-title">朋友圈</div>
+      <button class="topbar-btn" id="btnMomentVisitors" title="访客记录">🔔</button>
+      <button class="topbar-btn" id="btnNewMoment" title="发布">＋</button>
+    </div>
+    <div class="content content-flat" id="momentScroll">
+      <div class="moment-cover" id="momentCover">
+        <img id="momentCoverImg" alt="">
+        <span class="cover-hint">点击更换封面</span>
+      </div>
+      <div class="moment-profile">
+        <div class="avatar" id="momentMeAvatar">🌙</div>
+        <div class="profile-info">
+          <div class="profile-name" id="momentMeName">我</div>
+          <div class="profile-sub" id="momentSub">记录生活点滴</div>
+        </div>
+      </div>
+      <div style="padding: 0 14px;" id="momentList"></div>
+    </div>
+    <nav class="tabbar">
+      <div class="tab-item" data-tab="home"><div class="tab-icon">💬</div><div>消息</div></div>
+      <div class="tab-item active" data-tab="moments"><div class="tab-icon">🌍</div><div>朋友圈</div></div>
+      <div class="tab-item" data-tab="wishes"><div class="tab-icon">🎁</div><div>许愿</div></div>
+      <div class="tab-item" data-tab="settings"><div class="tab-icon">⚙️</div><div>设置</div></div>
+    </nav>
+  </section>
+
+  <!-- ============================================================
+       视图：许愿商城
+       ============================================================ -->
+  <section class="view" id="viewWishes">
+    <div class="topbar">
+      <div class="topbar-title">许愿商城</div>
+      <button class="topbar-btn" id="btnNewWish" title="添加愿望">＋</button>
+    </div>
+    <div class="content">
+      <div class="balance-card">
+        <div class="balance-label">我的余额</div>
+        <div class="balance-value" id="balanceValue">520</div>
+        <div class="balance-edit">
+          <input type="number" id="balanceInput" placeholder="输入新余额" min="0" step="1">
+          <button id="btnUpdateBalance">修改</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnDailyCheckin">每日签到</button>
+          <button class="btn btn-ghost" id="btnShowOrders">订单记录</button>
+          <button class="btn btn-ghost" id="btnShowLedger">收支明细</button>
+        </div>
+      </div>
+      <div class="card-title">愿望清单</div>
+      <div id="wishList"></div>
+    </div>
+    <nav class="tabbar">
+      <div class="tab-item" data-tab="home"><div class="tab-icon">💬</div><div>消息</div></div>
+      <div class="tab-item" data-tab="moments"><div class="tab-icon">🌍</div><div>朋友圈</div></div>
+      <div class="tab-item active" data-tab="wishes"><div class="tab-icon">🎁</div><div>许愿</div></div>
+      <div class="tab-item" data-tab="settings"><div class="tab-icon">⚙️</div><div>设置</div></div>
+    </nav>
+  </section>
+
+  <!-- ============================================================
+       视图：设置
+       ============================================================ -->
+  <section class="view" id="viewSettings">
+    <div class="topbar"><div class="topbar-title">设置</div></div>
+    <div class="content" id="settingsContent">
+
+      <div class="setting-section">
+        <div class="setting-section-title">🎨 全局主题</div>
+        <div class="theme-row" id="globalThemeRow">
+          <button class="theme-btn active" data-theme="light">浅色</button>
+          <button class="theme-btn" data-theme="dark">深色</button>
+          <button class="theme-btn" data-theme="macaron">马卡龙</button>
+        </div>
+        <div class="setting-row" style="margin-top:10px;">
+          <div class="setting-label">启动页图片</div>
+          <div class="setting-value">
+            <button class="btn btn-ghost btn-sm" id="btnSetSplash">更换</button>
+          </div>
+        </div>
+        <input type="file" id="splashFile" accept="image/*" hidden>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">👤 头像设置</div>
+        <div class="setting-row">
+          <div class="setting-label">形状</div>
+          <div class="setting-value">
+            <div class="avatar-shape-row">
+              <button class="shape-btn active" data-shape="50%">圆形</button>
+              <button class="shape-btn" data-shape="16%">方形</button>
+              <button class="shape-btn" data-shape="30%">圆角</button>
+            </div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">尺寸</div>
+          <div class="setting-value">
+            <div class="slider-field">
+              <input type="range" id="avatarSize" min="32" max="64" step="2" value="40">
+              <span class="slider-val" id="avatarSizeVal">40px</span>
+            </div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">我的头像</div>
+          <div class="setting-value"><button class="btn btn-ghost btn-sm" id="btnEditMyAvatar">更换</button></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">TA 的头像</div>
+          <div class="setting-value"><button class="btn btn-ghost btn-sm" id="btnEditTaAvatar">更换</button></div>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">✏️ 文字设置</div>
+        <div class="setting-row">
+          <div class="setting-label">字号</div>
+          <div class="setting-value">
+            <div class="slider-field">
+              <input type="range" id="fontSizeRange" min="12" max="22" step="1" value="15">
+              <span class="slider-val" id="fontSizeVal">15px</span>
+            </div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">字重</div>
+          <div class="setting-value">
+            <div class="font-family-row">
+              <button class="font-btn" data-weight="300">细</button>
+              <button class="font-btn active" data-weight="400">常规</button>
+              <button class="font-btn" data-weight="600">粗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">💬 气泡设置</div>
+        <div class="setting-row">
+          <div class="setting-label">圆角</div>
+          <div class="setting-value">
+            <div class="slider-field">
+              <input type="range" id="bubbleRadius" min="0" max="24" step="1" value="16">
+              <span class="slider-val" id="bubbleRadiusVal">16px</span>
+            </div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">边距</div>
+          <div class="setting-value">
+            <div class="slider-field">
+              <input type="range" id="bubblePad" min="6" max="20" step="1" value="12">
+              <span class="slider-val" id="bubblePadVal">12px</span>
+            </div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">我的气泡</div>
+          <div class="setting-value"><div class="color-picker-row" id="bubbleMeColors"></div></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">TA 的气泡</div>
+          <div class="setting-value"><div class="color-picker-row" id="bubbleTaColors"></div></div>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">🖼️ 聊天背景</div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnUploadChatBg">上传背景图</button>
+          <button class="btn btn-ghost" id="btnResetChatBg">恢复默认</button>
+        </div>
+        <div class="setting-row" style="margin-top:10px;">
+          <div class="setting-label">透明度</div>
+          <div class="setting-value">
+            <div class="slider-field">
+              <input type="range" id="bgOpacity" min="10" max="100" step="5" value="70">
+              <span class="slider-val" id="bgOpacityVal">70%</span>
+            </div>
+          </div>
+        </div>
+        <input type="file" id="chatBgFile" accept="image/*" hidden>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">📚 字卡库 <span class="badge" id="cardCountBadge">0</span></div>
+        <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:8px; line-height:1.6;">
+          支持高级语法：<br>
+          <code>普通文字</code> · 权重默认1<br>
+          <code>文字 | w:3</code> · 权重3倍<br>
+          <code>文字 | time:night</code> · 仅深夜<br>
+          <code>文字 | mood:high</code> · 高好感<br>
+          <code>文字 | time:night,mood:high,w:2</code> · 组合
+        </div>
+        <textarea class="field" id="newCardText" rows="3" placeholder="输入 TA 可能会说的话…&#10;每行一条，支持 | 分隔参数"></textarea>
+        <div class="btn-row" style="margin-top:8px;">
+          <button class="btn btn-primary" id="btnAddCard2">保存字卡</button>
+        </div>
+        <div id="cardList2" style="margin-top:12px; max-height:240px; overflow-y:auto;"></div>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">🔔 音效</div>
+        <div class="sound-row">
+          <div class="sound-label">消息提示音</div>
+          <div class="switch"><input type="checkbox" id="soundMsgOn" checked><span class="slider"></span></div>
+          <button data-upload-sound="msg">上传</button>
+        </div>
+        <div class="sound-row">
+          <div class="sound-label">来信铃声</div>
+          <div class="switch"><input type="checkbox" id="soundLetterOn" checked><span class="slider"></span></div>
+          <button data-upload-sound="letter">上传</button>
+        </div>
+        <div class="sound-row">
+          <div class="sound-label">来电铃声</div>
+          <div class="switch"><input type="checkbox" id="soundCallOn" checked><span class="slider"></span></div>
+          <button data-upload-sound="call">上传</button>
+        </div>
+        <div class="sound-row">
+          <div class="sound-label">通话背景音乐</div>
+          <div class="switch"><input type="checkbox" id="soundBgmOn"><span class="slider"></span></div>
+          <button data-upload-sound="bgm">上传</button>
+        </div>
+        <input type="file" id="soundFile" accept="audio/*" hidden>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">💾 数据管理</div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="btnExportJson">导出JSON</button>
+          <button class="btn btn-ghost" id="btnImportJson">导入JSON</button>
+        </div>
+        <div class="btn-row" style="margin-top:8px;">
+          <button class="btn btn-ghost" id="btnExportTxt2">导出TXT</button>
+          <button class="btn btn-ghost" id="btnImportTxt2">导入TXT</button>
+        </div>
+        <div class="btn-row" style="margin-top:8px;">
+          <button class="btn btn-ghost" id="btnExportExcel">导出统计报表</button>
+        </div>
+        <input type="file" id="importJsonFile" accept="application/json" hidden>
+        <input type="file" id="importTxtFile" accept=".txt,text/plain" hidden>
+        <div class="btn-row" style="margin-top:8px;">
+          <button class="btn btn-danger btn-block" id="btnClearChat">清空聊天记录</button>
+        </div>
+        <div class="btn-row" style="margin-top:8px;">
+          <button class="btn btn-danger btn-block" id="btnClearAll">清空所有数据</button>
+        </div>
+      </div>
+
+      <div style="text-align:center; font-size:11.5px; color:var(--text-light); padding:14px 0;">
+        私密空间 v4.0 · 全部数据本地保存
+      </div>
+    </div>
+    <nav class="tabbar">
+      <div class="tab-item" data-tab="home"><div class="tab-icon">💬</div><div>消息</div></div>
+      <div class="tab-item" data-tab="moments"><div class="tab-icon">🌍</div><div>朋友圈</div></div>
+      <div class="tab-item" data-tab="wishes"><div class="tab-icon">🎁</div><div>许愿</div></div>
+      <div class="tab-item active" data-tab="settings"><div class="tab-icon">⚙️</div><div>设置</div></div>
+    </nav>
+  </section>
+
+  <!-- ============================================================
+       二级视图
+       ============================================================ -->
+  <section class="view" id="viewPeriod">
+    <div class="topbar">
+      <button class="topbar-btn" data-back>←</button>
+      <div class="topbar-title">经期记录</div>
+      <button class="topbar-btn" id="btnPeriodMark">＋</button>
+    </div>
+    <div class="content">
+      <div class="card"><div class="card-title">本月日历</div><div id="periodCalendar" style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px;"></div></div>
+      <div class="card"><div class="card-title">经期记录</div><div id="periodList"></div></div>
+    </div>
+  </section>
+
+  <section class="view" id="viewDivination">
+    <div class="topbar"><button class="topbar-btn" data-back>←</button><div class="topbar-title">占卜</div></div>
+    <div class="content">
+      <div class="card">
+        <div class="card-title">塔罗 / 雷诺曼</div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnDrawTarot">抽塔罗</button>
+          <button class="btn btn-ghost" id="btnDrawLenormand">抽雷诺曼</button>
+        </div>
+        <div id="divinationResult" style="margin-top:14px;"></div>
+      </div>
+      <div class="card"><div class="card-title">历史记录</div><div id="divinationHistory"></div></div>
+    </div>
+  </section>
+
+  <section class="view" id="viewFavorites">
+    <div class="topbar">
+      <button class="topbar-btn" data-back>←</button>
+      <div class="topbar-title">收藏</div>
+      <button class="topbar-btn" id="btnFavSelect">☰</button>
+    </div>
+    <div class="content" id="favContent"><div id="favList"></div></div>
+    <div id="favSelectionBar" class="hidden" style="padding:10px 14px calc(10px + var(--safe-bottom)); background:var(--card); border-top:1px solid var(--border); display:flex; gap:8px;">
+      <button class="btn btn-ghost btn-sm" id="btnFavCancelSelect" style="flex:1;">取消</button>
+      <button class="btn btn-danger btn-sm" id="btnFavDelete" style="flex:1;">删除选中</button>
+    </div>
+  </section>
+
+  <section class="view" id="viewMusic">
+    <div class="topbar">
+      <button class="topbar-btn" data-back>←</button>
+      <div class="topbar-title">音乐库</div>
+      <button class="topbar-btn" id="btnNewMusic">＋</button>
+    </div>
+    <div class="content">
+      <div class="card"><div class="card-title">歌单分组</div><div class="btn-row" id="musicGroups"></div></div>
+      <div id="musicList"></div>
+    </div>
+  </section>
+
+  <section class="view" id="viewQuestions">
+    <div class="topbar">
+      <button class="topbar-btn" data-back>←</button>
+      <div class="topbar-title">提问库</div>
+      <button class="topbar-btn" id="btnNewQuestion">＋</button>
+    </div>
+    <div class="content"><div id="questionList"></div></div>
+  </section>
+
+  <section class="view" id="viewWater">
+    <div class="topbar"><button class="topbar-btn" data-back>←</button><div class="topbar-title">喝水打卡</div></div>
+    <div class="content">
+      <div class="card">
+        <div class="card-title">今日饮水</div>
+        <div style="font-size:32px; font-weight:700; text-align:center; margin:14px 0; color:#6cb8f0;">
+          <span id="waterCount">0</span> <span style="font-size:16px; color:var(--text-muted);">/ 8 杯</span>
+        </div>
+        <div id="waterGrid" style="display:grid; grid-template-columns:repeat(8,1fr); gap:6px;"></div>
+        <div class="btn-row" style="margin-top:14px;"><button class="btn btn-ghost" id="btnWaterReset">重置今日</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="viewLetters">
+    <div class="topbar">
+      <button class="topbar-btn" data-back>←</button>
+      <div class="topbar-title">信件收纳盒</div>
+      <button class="topbar-btn" id="btnShowArchived" title="已归档">📦</button>
+    </div>
+    <div class="content" id="letterContent"><div id="letterList"></div></div>
+  </section>
+
+  <section class="view" id="viewCalls">
+    <div class="topbar">
+      <button class="topbar-btn" data-back>←</button>
+      <div class="topbar-title">通话记录</div>
+    </div>
+    <div class="content"><div id="callList"></div></div>
+  </section>
+
+  <section class="view" id="viewDiary">
+    <div class="topbar">
+      <button class="topbar-btn" data-back>←</button>
+      <div class="topbar-title">日记本</div>
+      <button class="topbar-btn" id="btnNewDiary">＋</button>
+    </div>
+    <div class="content"><div id="diaryList"></div></div>
+  </section>
+
+  <section class="view" id="viewCountdown">
+    <div class="topbar">
+      <button class="topbar-btn" data-back>←</button>
+      <div class="topbar-title">倒计时</div>
+      <button class="topbar-btn" id="btnNewCountdown">＋</button>
+    </div>
+    <div class="content"><div id="countdownList"></div></div>
+  </section>
+
+  <section class="view" id="viewStats">
+    <div class="topbar"><button class="topbar-btn" data-back>←</button><div class="topbar-title">数据统计</div></div>
+    <div class="content" id="statsContent"></div>
+  </section>
+
+  <section class="view" id="viewCharacters">
+    <div class="topbar"><button class="topbar-btn" data-back>←</button><div class="topbar-title">梦角档案</div></div>
+    <div class="content" id="characterContent"></div>
+  </section>
+
+  <section class="view" id="viewWallpapers">
+    <div class="topbar">
+      <button class="topbar-btn" data-back>←</button>
+      <div class="topbar-title">壁纸库</div>
+    </div>
+    <div class="content"><div class="wallpaper-grid" id="wallpaperGrid"></div></div>
+  </section>
+
+  <section class="view" id="viewSounds">
+    <div class="topbar"><button class="topbar-btn" data-back>←</button><div class="topbar-title">音效</div></div>
+    <div class="content" id="soundsContent"></div>
+  </section>
+
+  <!-- ============================================================
+       通话浮窗 & 弹窗
+       ============================================================ -->
+  <div class="call-float" id="callFloat">
+    <div class="call-avatar" id="callFloatAvatar">🐰</div>
+    <div class="call-name" id="callFloatName">TA</div>
+    <div class="call-time" id="callFloatTime">00:00</div>
+    <button class="hangup-btn" id="btnHangupFloat">📵</button>
+  </div>
+
+  <div class="modal-mask" id="dialerModal">
+    <div class="modal dialer-modal">
+      <div class="dialer-avatar" id="dialerAvatar">🐰</div>
+      <div class="dialer-name" id="dialerName">TA</div>
+      <div class="dialer-status" id="dialerStatus">准备呼叫…</div>
+      <div class="dialer-actions">
+        <button class="dialer-btn hangup" id="btnDialerCancel">✕</button>
+        <button class="dialer-btn call" id="btnDialerCall">📞</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="incomingModal">
+    <div class="modal dialer-modal">
+      <div class="incoming-badge">来电</div>
+      <div class="dialer-avatar" id="incomingAvatar">🐰</div>
+      <div class="dialer-name" id="incomingName">TA</div>
+      <div class="dialer-status">邀请你进行语音通话</div>
+      <div class="incoming-countdown">剩余 <b id="incomingCount">15</b> 秒自动挂断</div>
+      <div class="dialer-actions" style="margin-top:20px;">
+        <button class="dialer-btn hangup" id="btnIncomingReject">✕</button>
+        <button class="dialer-btn call" id="btnIncomingAccept">📞</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="confirmModal">
+    <div class="modal">
+      <h3 class="modal-title" id="confirmTitle">确认操作</h3>
+      <div class="modal-text" id="confirmText">确定要执行此操作吗？</div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="confirmCancel">取消</button>
+        <button class="btn btn-danger" id="confirmOk">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="formModal">
+    <div class="modal">
+      <h3 class="modal-title" id="formTitle">编辑</h3>
+      <div id="formFields" style="display:flex;flex-direction:column;gap:10px; max-height:60vh; overflow-y:auto; padding:2px;"></div>
+      <div class="modal-actions" style="margin-top:16px;">
+        <button class="btn btn-ghost" id="formCancel">取消</button>
+        <button class="btn btn-primary" id="formOk">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-mask" id="drawerMask"></div>
+  <aside class="drawer" id="drawerPanel">
+    <div class="drawer-head">
+      <h3 id="drawerTitle">详情</h3>
+      <button class="topbar-btn" id="btnDrawerClose">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+  <div class="context-menu" id="contextMenu"></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
